@@ -51,6 +51,8 @@ npm start
 
 
 
+##📁 Repository Directory Structure
+
 WorkSphere-HR-/
 ├── client/                 # React SPA Frontend Application
 │   ├── src/
