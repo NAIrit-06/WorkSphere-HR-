@@ -47,3 +47,18 @@ npm run install-all
 
 # 2. Fire up the API server and user interface simultaneously
 npm start
+
+
+
+
+WorkSphere-HR-/
+├── client/                 # React SPA Frontend Application
+│   ├── src/
+│   │   ├── pages/          # Dashboards, Logins, Stream Views
+│   │   ├── index.css       # Tailwind directive structures
+│   └── package.json
+├── server/                 # Node.js Server & Router System
+│   ├── api/                # Corporate Endpoint Routing Gateways
+│   └── package.json
+├── package.json            # Unified Root Workspace Orchestration Control
+└── README.md               # Architecture Documentation File
