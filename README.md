@@ -48,7 +48,7 @@ npm run install-all
 # 2. Fire up the API server and user interface simultaneously
 npm start
 
-
+|
 
 
 ##📁 Repository Directory Structure
