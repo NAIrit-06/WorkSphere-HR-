@@ -1,4 +1,4 @@
-# WorkSphere-HR-
+
 # WorkSphere HRMS 🏢🚀
 
 WorkSphere is a modern, high-performance Human Resource Management System (HRMS) built to manage corporate attendance logging pipelines, leave authorization flows, and payroll ledgers. 
