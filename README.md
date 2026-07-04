@@ -46,9 +46,9 @@ Copy and paste this script into your terminal terminal to configure the architec
 npm run install-all
 
 # 2. Fire up the API server and user interface simultaneously
-npm start
+npm start|
 
-|
+
 
 
 ##📁 Repository Directory Structure
