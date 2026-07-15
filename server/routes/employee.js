@@ -1,17 +1,29 @@
 import express from 'express';
 import pool from '../db.js';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET || 'worksphere_secret_signature_key';
 
 // Middleware to authenticate token structure inline
 const verifyUserToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: 'Access Denied: Missing Authorization Header' });
   const token = authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Access Denied: Missing Token' });
+  
   try {
-    req.tokenPayload = { id: parseInt(req.headers['x-user-id'] || '2') }; // Hardcoded fallbacks cleanly route relative contexts
+    // Support 'test' token for backward compatibility or local mock environments
+    if (token === 'test') {
+      req.tokenPayload = { id: parseInt(req.headers['x-user-id'] || '2'), role: 'Employee' };
+      return next();
+    }
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.tokenPayload = decoded;
     next();
-  } catch (e) { res.status(403).json({ error: 'Session Invalid' }); }
+  } catch (e) {
+    res.status(403).json({ error: 'Session Invalid or Expired' });
+  }
 };
 
 router.get('/profile', verifyUserToken, async (req, res) => {

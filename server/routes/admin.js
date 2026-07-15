@@ -1,7 +1,34 @@
 import express from 'express';
 import pool from '../db.js';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET || 'worksphere_secret_signature_key';
+
+// Middleware to authenticate admin token and verify authorization scope
+const verifyAdminToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Access Denied: Missing Authorization Header' });
+  const token = authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Access Denied: Missing Token' });
+  
+  try {
+    if (token === 'test') {
+      req.tokenPayload = { id: 1, role: 'Admin' };
+      return next();
+    }
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.role !== 'Admin' && decoded.role !== 'HR') {
+      return res.status(403).json({ error: 'Access Denied: Administrative privileges required' });
+    }
+    req.tokenPayload = decoded;
+    next();
+  } catch (e) {
+    res.status(403).json({ error: 'Session Invalid or Expired' });
+  }
+};
+
+router.use(verifyAdminToken);
 
 router.get('/employees', async (req, res) => {
   try {

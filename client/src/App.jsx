@@ -11,15 +11,26 @@ import EmployeeManagement from './pages/EmployeeManagement';
 import AttendanceManagement from './pages/AttendanceManagement';
 import LeaveApproval from './pages/LeaveApproval';
 import PayrollManagement from './pages/PayrollManagement';
+import Logo from './pages/Logo';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('Splash');
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem("user");
+    return saved ? JSON.parse(saved) : null;
+  });
 
   useEffect(() => {
     if (currentPage === 'Splash') {
       const timer = setTimeout(() => {
-        setCurrentPage('Login');
+        const savedUser = localStorage.getItem("user");
+        if (savedUser) {
+          const parsed = JSON.parse(savedUser);
+          setUser(parsed);
+          setCurrentPage(parsed.role === 'Admin' ? 'AdminDashboard' : 'EmployeeDashboard');
+        } else {
+          setCurrentPage('Login');
+        }
       }, 2500);
       return () => clearTimeout(timer);
     }
@@ -27,43 +38,106 @@ export default function App() {
 
   const navigateTo = (page) => setCurrentPage(page);
 
+  // Clear session data on logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    navigateTo('Login');
+  };
+
   // Structural Navigation Layout wrapper matching high-fidelity sidebar specs
-  const Layout = ({ children }) => (
-    <div className="flex h-screen bg-brand-lightBg">
-      <aside className="w-64 bg-brand-navy text-white flex flex-col justify-between shadow-xl">
-        <div className="p-6">
-          <div className="flex items-center space-x-3 mb-8">
-            <div className="w-8 h-8 rounded-full bg-brand-teal border border-white flex items-center justify-center font-bold text-brand-navy">W</div>
-            <span className="text-xl font-bold tracking-wider text-brand-lightBg">WorkSphere</span>
+  const Layout = ({ children }) => {
+    const navItemClass = (pageName) => {
+      const isActive = currentPage === pageName;
+      return `w-full text-left px-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center space-x-3 border-l-4 ${
+        isActive 
+          ? 'bg-brand-teal/10 border-brand-teal text-brand-teal shadow-inner' 
+          : 'border-transparent text-gray-300 hover:bg-white/5 hover:text-white hover:border-white/20'
+      }`;
+    };
+
+    return (
+      <div className="flex h-screen bg-brand-lightBg font-sans overflow-hidden">
+        <aside className="w-64 bg-gradient-to-b from-brand-navyDark to-brand-navy text-white flex flex-col justify-between shadow-2xl z-20 border-r border-white/5">
+          <div className="p-6">
+            <div className="flex items-center space-x-3 mb-8 pb-4 border-b border-white/10">
+              <Logo className="w-8 h-8 text-white" showText={true} textClassName="text-lg font-bold tracking-wider text-white" />
+            </div>
+            
+            <nav className="space-y-1.5">
+              {user?.role === 'Admin' ? (
+                <>
+                  <button onClick={() => navigateTo('AdminDashboard')} className={navItemClass('AdminDashboard')}>
+                    <span>📊</span> <span>Dashboard</span>
+                  </button>
+                  <button onClick={() => navigateTo('EmployeeManagement')} className={navItemClass('EmployeeManagement')}>
+                    <span>👥</span> <span>Employees</span>
+                  </button>
+                  <button onClick={() => navigateTo('AttendanceManagement')} className={navItemClass('AttendanceManagement')}>
+                    <span>📅</span> <span>Attendance Log</span>
+                  </button>
+                  <button onClick={() => navigateTo('LeaveApproval')} className={navItemClass('LeaveApproval')}>
+                    <span>⚖️</span> <span>Leave Approvals</span>
+                  </button>
+                  <button onClick={() => navigateTo('PayrollManagement')} className={navItemClass('PayrollManagement')}>
+                    <span>💵</span> <span>Payroll Controls</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => navigateTo('EmployeeDashboard')} className={navItemClass('EmployeeDashboard')}>
+                    <span>📊</span> <span>Dashboard</span>
+                  </button>
+                  <button onClick={() => navigateTo('Profile')} className={navItemClass('Profile')}>
+                    <span>👤</span> <span>My Profile</span>
+                  </button>
+                  <button onClick={() => navigateTo('Attendance')} className={navItemClass('Attendance')}>
+                    <span>⏱️</span> <span>Attendance</span>
+                  </button>
+                  <button onClick={() => navigateTo('Leave')} className={navItemClass('Leave')}>
+                    <span>📝</span> <span>Apply Leave</span>
+                  </button>
+                  <button onClick={() => navigateTo('Payroll')} className={navItemClass('Payroll')}>
+                    <span>💸</span> <span>My Payroll</span>
+                  </button>
+                </>
+              )}
+            </nav>
           </div>
-          <nav className="space-y-2">
-            {user?.role === 'Admin' ? (
-              <>
-                <button onClick={() => navigateTo('AdminDashboard')} className="w-full text-left px-4 py-2.5 rounded hover:bg-opacity-20 hover:bg-white transition">Dashboard</button>
-                <button onClick={() => navigateTo('EmployeeManagement')} className="w-full text-left px-4 py-2.5 rounded hover:bg-opacity-20 hover:bg-white transition">Employees</button>
-                <button onClick={() => navigateTo('AttendanceManagement')} className="w-full text-left px-4 py-2.5 rounded hover:bg-opacity-20 hover:bg-white transition">Attendance Log</button>
-                <button onClick={() => navigateTo('LeaveApproval')} className="w-full text-left px-4 py-2.5 rounded hover:bg-opacity-20 hover:bg-white transition">Leave Approvals</button>
-                <button onClick={() => navigateTo('PayrollManagement')} className="w-full text-left px-4 py-2.5 rounded hover:bg-opacity-20 hover:bg-white transition">Payroll Controls</button>
-              </>
-            ) : (
-              <>
-                <button onClick={() => navigateTo('EmployeeDashboard')} className="w-full text-left px-4 py-2.5 rounded hover:bg-opacity-20 hover:bg-white transition">Dashboard</button>
-                <button onClick={() => navigateTo('Profile')} className="w-full text-left px-4 py-2.5 rounded hover:bg-opacity-20 hover:bg-white transition">My Profile</button>
-                <button onClick={() => navigateTo('Attendance')} className="w-full text-left px-4 py-2.5 rounded hover:bg-opacity-20 hover:bg-white transition">Attendance</button>
-                <button onClick={() => navigateTo('Leave')} className="w-full text-left px-4 py-2.5 rounded hover:bg-opacity-20 hover:bg-white transition">Apply Leave</button>
-                <button onClick={() => navigateTo('Payroll')} className="w-full text-left px-4 py-2.5 rounded hover:bg-opacity-20 hover:bg-white transition">My Payroll</button>
-              </>
-            )}
-          </nav>
-        </div>
-        <div className="p-6 border-t border-gray-700 bg-black bg-opacity-20">
-          <div className="text-sm font-medium mb-2">{user?.name || 'Session Account'}</div>
-          <button onClick={() => { setUser(null); navigateTo('Login'); }} className="w-full text-center bg-red-500 bg-opacity-80 hover:bg-opacity-100 py-1.5 rounded text-xs font-semibold tracking-wide transition">Log Out</button>
-        </div>
-      </aside>
-      <main className="flex-1 overflow-y-auto p-8">{children}</main>
-    </div>
-  );
+          
+          <div className="p-6 border-t border-white/10 bg-black/10 backdrop-blur-sm flex flex-col gap-3">
+            <div className="flex items-center space-x-3">
+              <img 
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150" 
+                alt="Avatar" 
+                className="w-9 h-9 rounded-xl border border-white/20 object-cover" 
+              />
+              <div className="overflow-hidden">
+                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">{user?.role || 'User'}</div>
+                <div className="text-sm font-semibold text-white truncate max-w-[150px]">{user?.name || 'Session Account'}</div>
+              </div>
+            </div>
+            
+            <button 
+              onClick={handleLogout} 
+              className="w-full text-center bg-red-500/20 hover:bg-red-500 text-red-200 hover:text-white py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 border border-red-500/30 hover:border-red-500"
+            >
+              Sign Out Securely
+            </button>
+          </div>
+        </aside>
+        
+        <main className="flex-1 overflow-y-auto p-8 relative">
+          {/* Subtle background glow */}
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-teal/5 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="relative z-10 animate-fade-in">
+            {children}
+          </div>
+        </main>
+      </div>
+    );
+  };
 
   switch (currentPage) {
     case 'Splash': return <Splash />;

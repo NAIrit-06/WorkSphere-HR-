@@ -23,8 +23,6 @@ export default function LeaveApproval() {
       }
 
       const data = await res.json();
-
-      // Supports both [] and { leaves: [] }
       setLeaves(Array.isArray(data) ? data : data.leaves || []);
     } catch (err) {
       console.error(err);
@@ -66,9 +64,7 @@ export default function LeaveApproval() {
       }
 
       await res.json();
-
       alert(`Leave request ${decision.toLowerCase()} successfully.`);
-
       fetchAllLeaves();
     } catch (err) {
       console.error(err);
@@ -77,78 +73,79 @@ export default function LeaveApproval() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold text-navyPrimary">
-          Global Time-Off Verification Engine
-        </h2>
+    <div className="space-y-6 animate-fade-in font-sans">
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-bold text-brand-navy">
+            Leave Approvals Pipeline
+          </h2>
+          <p className="text-xs text-brand-slate font-medium mt-0.5">Validate employee time-off intents and record comments</p>
+        </div>
       </div>
 
       {loading ? (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center text-gray-500">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center text-brand-slate font-medium">
           Loading leave requests...
         </div>
       ) : error ? (
-        <div className="bg-red-50 border border-red-200 text-red-600 p-6 rounded-xl text-center">
+        <div className="bg-red-50/50 border border-red-200 text-red-600 p-6 rounded-2xl text-center font-semibold">
           {error}
         </div>
       ) : leaves.length === 0 ? (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center text-gray-400 italic">
-          No active or historical employee leave filings inside logs.
+        <div className="bg-white p-10 rounded-2xl shadow-sm border border-gray-100 text-center text-brand-slate italic font-medium">
+          No active or historical employee leave requests recorded.
         </div>
       ) : (
         <div className="space-y-4">
           {leaves.map((l) => (
             <div
               key={l.id}
-              className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition"
+              className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition duration-200"
             >
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-base text-navyPrimary">
+                <div className="flex items-center gap-3">
+                  <span className="font-bold text-base text-brand-navy">
                     {l.name || "Unknown Employee"}
                   </span>
 
-                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-mono bg-brand-lightBg text-brand-teal px-2 py-0.5 rounded-md font-bold">
                     ID: {l.employee_id || "N/A"}
                   </span>
                 </div>
 
-                <p className="text-sm text-gray-600 mt-1">
-                  <b className="text-mintTeal">
-                    {l.leave_type || "Unspecified"} Leave
-                  </b>
-                  {" : "}
-                  {l.start_date
-                    ? new Date(l.start_date).toLocaleDateString()
-                    : "N/A"}
-                  {" to "}
-                  {l.end_date
-                    ? new Date(l.end_date).toLocaleDateString()
-                    : "N/A"}
+                <p className="text-sm text-brand-slate font-semibold mt-1.5">
+                  Type: <span className="text-brand-teal">{l.leave_type || "Unspecified"} Leave</span>
+                  <span className="mx-2 text-gray-300">|</span>
+                  Duration: <span className="text-brand-navy">{l.start_date ? new Date(l.start_date).toLocaleDateString() : "N/A"} to {l.end_date ? new Date(l.end_date).toLocaleDateString() : "N/A"}</span>
                 </p>
 
                 {l.remarks && (
-                  <p className="text-xs italic text-gray-400 mt-1">
+                  <p className="text-xs italic text-brand-slate/80 bg-brand-lightBg/50 p-2.5 rounded-xl border border-gray-100/50 mt-2.5">
                     Context: "{l.remarks}"
+                  </p>
+                )}
+                
+                {l.admin_comments && (
+                  <p className="text-xs text-brand-teal font-medium mt-2">
+                    Remarks: <span className="italic text-brand-slate">"{l.admin_comments}"</span>
                   </p>
                 )}
               </div>
 
               {l.status === "Pending" ? (
-                <div className="flex gap-2">
+                <div className="flex gap-2.5">
                   <button
                     onClick={() => handleDecision(l.id, "Approved")}
-                    className="bg-mintTeal text-white font-bold text-xs px-4 py-2 rounded hover:opacity-90 transition"
+                    className="bg-brand-teal text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-brand-teal/95 shadow-sm shadow-brand-teal/15 transition active:scale-[0.98]"
                   >
-                    Approve Request
+                    Approve
                   </button>
 
                   <button
                     onClick={() => handleDecision(l.id, "Rejected")}
-                    className="bg-red-500 text-white font-bold text-xs px-4 py-2 rounded hover:opacity-90 transition"
+                    className="bg-red-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-red-500/95 shadow-sm shadow-red-500/15 transition active:scale-[0.98]"
                   >
-                    Reject Request
+                    Reject
                   </button>
                 </div>
               ) : (

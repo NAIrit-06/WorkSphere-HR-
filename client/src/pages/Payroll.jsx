@@ -49,29 +49,27 @@ export default function Payroll({ user }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in font-sans">
       {/* Header */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold mb-1 text-navyPrimary">
-          Financial Payroll Ledger
-        </h2>
-
-        <p className="text-xs text-red-500 font-semibold tracking-wide">
-          🔒 Read-Only Terminal Mode Enabled. Context secured by cryptographic
-          policy.
-        </p>
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-bold text-brand-navy">
+            Your Payroll Ledger
+          </h2>
+          <p className="text-xs text-brand-slate font-semibold mt-0.5">🔒 Read-Only Mode (Secured by cryptographic access policy)</p>
+        </div>
       </div>
 
       {loading ? (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center text-gray-500">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center text-brand-slate font-medium">
           Loading payroll records...
         </div>
       ) : error ? (
-        <div className="bg-red-50 p-6 rounded-xl border border-red-200 text-center text-red-600">
+        <div className="bg-red-50/50 p-6 rounded-2xl border border-red-200 text-center text-red-600 font-semibold">
           {error}
         </div>
       ) : payrolls.length === 0 ? (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center text-gray-400 italic">
+        <div className="bg-white p-10 rounded-2xl shadow-sm border border-gray-100 text-center text-brand-slate italic font-medium">
           No generated pay slips found for this account.
         </div>
       ) : (
@@ -79,31 +77,31 @@ export default function Payroll({ user }) {
           {payrolls.map((p) => (
             <div
               key={p.id}
-              className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-4 items-center hover:shadow-md transition"
+              className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-4 items-center hover:shadow-md transition duration-200"
             >
               <div>
-                <span className="text-xs text-gray-400 block font-medium">
+                <span className="text-xs text-brand-slate block font-bold uppercase tracking-wider">
                   Processing Month
                 </span>
-                <span className="font-bold text-navyPrimary">
+                <span className="font-extrabold text-brand-navy mt-0.5 block">
                   {p.month_year}
                 </span>
               </div>
 
               <div>
-                <span className="text-xs text-gray-400 block font-medium">
+                <span className="text-xs text-brand-slate block font-bold uppercase tracking-wider">
                   Base Allocation
                 </span>
-                <span className="font-semibold text-gray-700">
+                <span className="font-semibold text-brand-navy/95 mt-0.5 block">
                   ₹{formatCurrency(p.base_salary || 0)}
                 </span>
               </div>
 
               <div>
-                <span className="text-xs text-gray-400 block font-medium">
+                <span className="text-xs text-brand-slate block font-bold uppercase tracking-wider">
                   Net Disbursed
                 </span>
-                <span className="font-extrabold text-mintTeal">
+                <span className="font-extrabold text-brand-teal mt-0.5 block">
                   ₹{formatCurrency(p.net_salary || 0)}
                 </span>
               </div>
@@ -113,7 +111,7 @@ export default function Payroll({ user }) {
                   className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
                     p.status === "Paid"
                       ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
+                      : "bg-red-100 text-red-700"
                   }`}
                 >
                   {p.status || "Pending"}
